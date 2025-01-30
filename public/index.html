@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint Shop Inventory</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav>
+        <div class="nav-container">
+            <h1>Paint Inventory</h1>
+            <div class="nav-buttons">
+                <button id="addButton">
+                    <i class="fas fa-plus"></i>
+                    Add
+                </button>
+                <button id="scanButton">
+                    <i class="fas fa-barcode"></i>
+                    Scan
+                </button>
+                <button id="reportsButton">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search paint...">
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Inventory List -->
+        <div id="inventoryList"></div>
+
+        <!-- Add Item Modal -->
+        <div id="addModal" class="modal">
+            <div class="modal-content">
+                <h3>Add New Paint</h3>
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="paintName">Paint Name:</label>
+                        <input type="text" id="paintName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paintBrand">Brand:</label>
+                        <input type="text" id="paintBrand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paintColor">Color:</label>
+                        <input type="text" id="paintColor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paintType">Type:</label>
+                        <select id="paintType" required>
+                            <option value="">Select Type</option>
+                            <option value="latex">Latex</option>
+                            <option value="oil">Oil-based</option>
+                            <option value="primer">Primer</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fiveGallons">5 Gallon Buckets:</label>
+                        <input type="number" id="fiveGallons" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="singleGallons">1 Gallon Cans:</label>
+                        <input type="number" id="singleGallons" min="0" value="0">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit">Save</button>
+                        <button type="button" class="close-modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Scanner Modal -->
+        <div id="scanModal" class="modal">
+            <div class="modal-content">
+                <h3>Scan Barcode</h3>
+                <div id="interactive" class="viewport"></div>
+                <div id="scanResult"></div>
+                <button class="close-modal">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Reports Modal -->
+        <div id="reportsModal" class="modal">
+            <div class="modal-content">
+                <h3>Inventory Reports</h3>
+                <div class="date-filter">
+                    <label>From: <input type="date" id="startDate"></label>
+                    <label>To: <input type="date" id="endDate"></label>
+                    <button id="filterDates">Apply Filter</button>
+                </div>
+                <div class="reports-table">
+                    <table id="reportsTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Action</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody"></tbody>
+                    </table>
+                </div>
+                <button id="exportReport">Export to CSV</button>
+                <button class="close-modal">Close</button>
+            </div>
+        </div>
+
+        <!-- Edit Item Modal -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <h3>Edit Paint</h3>
+                <form id="editItemForm">
+                    <div class="form-group">
+                        <label for="editPaintName">Paint Name:</label>
+                        <input type="text" id="editPaintName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaintBrand">Brand:</label>
+                        <input type="text" id="editPaintBrand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaintColor">Color:</label>
+                        <input type="text" id="editPaintColor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaintType">Type:</label>
+                        <select id="editPaintType" required>
+                            <option value="">Select Type</option>
+                            <option value="latex">Latex</option>
+                            <option value="oil">Oil-based</option>
+                            <option value="primer">Primer</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarcode">Barcode:</label>
+                        <div class="barcode-input">
+                            <input type="text" id="editBarcode" readonly>
+                            <button type="button" id="scanEditBarcode">
+                                <i class="fas fa-barcode"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFiveGallons">5 Gallon Buckets:</label>
+                        <input type="number" id="editFiveGallons" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editSingleGallons">1 Gallon Cans:</label>
+                        <input type="number" id="editSingleGallons" min="0" value="0">
+                    </div>
+                    <!-- Add barcode scanner viewport -->
+                    <div id="editBarcodeScanner" class="scanner-viewport" style="display: none;">
+                        <div id="editInteractive" class="viewport"></div>
+                        <div id="editScanResult"></div>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit">Save Changes</button>
+                        <button type="button" id="deleteItem" class="delete-button">Delete Item</button>
+                        <button type="button" class="cancel-edit">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add these Firebase SDK scripts BEFORE app.js -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+    
+    <!-- Add QuaggaJS -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    
+    <!-- Then your app.js -->
+    <script src="app.js"></script>
+</body>
+</html> 

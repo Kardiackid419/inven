@@ -1,0 +1,364 @@
+:root {
+    --primary-color: #2196F3;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Navigation */
+nav {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-buttons button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.nav-buttons button:hover {
+    background-color: #1976D2;
+}
+
+.nav-buttons button i {
+    font-size: 1.2rem;
+}
+
+/* Search Bar */
+.search-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#searchBar {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Inventory List */
+#inventoryList {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Touch-friendly buttons */
+button {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Scanner Viewport */
+.viewport {
+    width: 100%;
+    height: 300px;
+    border: 2px solid #ddd;
+    margin: 1rem 0;
+}
+
+/* Quantity Inputs */
+.quantity-inputs {
+    margin: 1rem 0;
+}
+
+.quantity-inputs div {
+    margin: 1rem 0;
+}
+
+.quantity-inputs label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.quantity-inputs input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* New Item Form */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.form-buttons {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 1rem;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.form-buttons button[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.form-buttons button[type="button"] {
+    background-color: #e0e0e0;
+    color: var(--text-color);
+}
+
+/* Reports Modal */
+.reports-content {
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.date-filter {
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.date-filter label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-filter input[type="date"] {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.reports-table-container {
+    overflow-x: auto;
+}
+
+#reportsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+#reportsTable th,
+#reportsTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#reportsTable th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+#reportsTable tr:hover {
+    background-color: #f8f8f8;
+}
+
+.reports-table {
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.reports-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reports-table th,
+.reports-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.inventory-item {
+    background: white;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.inventory-item:hover {
+    background-color: #f5f5f5;
+}
+
+.inventory-item h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+}
+
+.inventory-item p {
+    margin: 0.25rem 0;
+}
+
+/* Scanner styles */
+#interactive.viewport {
+    position: relative;
+    width: 100%;
+    height: 300px;
+}
+
+#interactive.viewport > canvas, #interactive.viewport > video {
+    max-width: 100%;
+    width: 100%;
+}
+
+#interactive.viewport canvas.drawing, #interactive.viewport canvas.drawingBuffer {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#scanResult {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+.barcode-input {
+    display: flex;
+    gap: 10px;
+}
+
+.barcode-input input {
+    flex: 1;
+}
+
+.barcode-input button {
+    padding: 5px 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.scanner-viewport {
+    margin: 10px 0;
+    max-width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
+
+#editInteractive.viewport {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#editInteractive.viewport > canvas, #editInteractive.viewport > video {
+    max-width: 100%;
+    width: 100%;
+}
+
+#editInteractive.viewport canvas.drawing, #editInteractive.viewport canvas.drawingBuffer {
+    position: absolute;
+    left: 0;
+    top: 0;
+} 
