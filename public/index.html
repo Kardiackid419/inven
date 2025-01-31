@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Add this near the top of the body -->
+    <datalist id="knownBrands"></datalist>
+
     <!-- Main Navigation -->
     <nav>
         <div class="nav-container">
@@ -30,9 +33,47 @@
         </div>
     </nav>
 
-    <!-- Search Bar -->
+    <!-- Add this after the nav and before the filter-sort-container -->
     <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Search paint...">
+        <input type="text" id="searchBar" placeholder="Search paint by name, brand, color..." class="search-input">
+    </div>
+
+    <!-- Add this after the search bar -->
+    <div class="filter-sort-container">
+        <div class="filter-group">
+            <select id="filterType">
+                <option value="">Filter by Type</option>
+                <option value="acrylic">Acrylic</option>
+                <option value="enamel">Enamel</option>
+                <option value="epoxy">Epoxy</option>
+                <option value="latex">Latex</option>
+                <option value="oil">Oil-based</option>
+                <option value="primer">Primer</option>
+                <option value="urethane">Urethane</option>
+                <option value="waterbase">Waterbase</option>
+                <option value="other">Other</option>
+            </select>
+
+            <select id="filterSheen">
+                <option value="">Filter by Sheen</option>
+                <option value="n/a">N/A</option>
+                <option value="eggshell">Eggshell</option>
+                <option value="gloss">Gloss</option>
+                <option value="high-gloss">High Gloss</option>
+                <option value="matte">Matte</option>
+                <option value="semi-gloss">Semi-Gloss</option>
+            </select>
+
+            <select id="sortBy">
+                <option value="">Sort By</option>
+                <option value="name">Name</option>
+                <option value="brand">Brand</option>
+                <option value="type">Type</option>
+                <option value="quantity">Quantity</option>
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+            </select>
+        </div>
     </div>
 
     <!-- Main Content Area -->
@@ -61,19 +102,68 @@
                         <label for="paintType">Type:</label>
                         <select id="paintType" required>
                             <option value="">Select Type</option>
+                            <option value="acrylic">Acrylic</option>
+                            <option value="enamel">Enamel</option>
+                            <option value="epoxy">Epoxy</option>
                             <option value="latex">Latex</option>
                             <option value="oil">Oil-based</option>
                             <option value="primer">Primer</option>
+                            <option value="urethane">Urethane</option>
+                            <option value="waterbase">Waterbase</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="paintSheen">Sheen:</label>
+                        <select id="paintSheen">
+                            <option value="">Select Sheen</option>
+                            <option value="n/a">N/A</option>
+                            <option value="eggshell">Eggshell</option>
+                            <option value="gloss">Gloss</option>
+                            <option value="high-gloss">High Gloss</option>
+                            <option value="matte">Matte</option>
+                            <option value="semi-gloss">Semi-Gloss</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="fiveGallons">5 Gallon Buckets:</label>
-                        <input type="number" id="fiveGallons" min="0" value="0">
+                        <div class="quantity-container">
+                            <input type="number" id="fiveGallons" min="0" value="0">
+                            <div class="partial-container">
+                                <input type="checkbox" id="fiveGallonPartials">
+                                <label for="fiveGallonPartials">Partials</label>
+                                <input type="number" 
+                                       id="fiveGallonPartialsQty" 
+                                       min="0" 
+                                       value="0" 
+                                       class="partial-qty" 
+                                       style="display: none;">
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="singleGallons">1 Gallon Cans:</label>
-                        <input type="number" id="singleGallons" min="0" value="0">
+                        <div class="quantity-container">
+                            <input type="number" id="singleGallons" min="0" value="0">
+                            <div class="partial-container">
+                                <input type="checkbox" id="singleGallonPartials">
+                                <label for="singleGallonPartials">Partials</label>
+                                <input type="number" 
+                                       id="singleGallonPartialsQty" 
+                                       min="0" 
+                                       value="0" 
+                                       class="partial-qty" 
+                                       style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarts">Quarts:</label>
+                        <input type="number" id="quarts" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="pints">Pints:</label>
+                        <input type="number" id="pints" min="0" value="0">
                     </div>
                     <div class="form-buttons">
                         <button type="submit">Save</button>
@@ -141,10 +231,27 @@
                         <label for="editPaintType">Type:</label>
                         <select id="editPaintType" required>
                             <option value="">Select Type</option>
+                            <option value="acrylic">Acrylic</option>
+                            <option value="enamel">Enamel</option>
+                            <option value="epoxy">Epoxy</option>
                             <option value="latex">Latex</option>
                             <option value="oil">Oil-based</option>
                             <option value="primer">Primer</option>
+                            <option value="urethane">Urethane</option>
+                            <option value="waterbase">Waterbase</option>
                             <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaintSheen">Sheen:</label>
+                        <select id="editPaintSheen">
+                            <option value="">Select Sheen</option>
+                            <option value="n/a">N/A</option>
+                            <option value="eggshell">Eggshell</option>
+                            <option value="gloss">Gloss</option>
+                            <option value="high-gloss">High Gloss</option>
+                            <option value="matte">Matte</option>
+                            <option value="semi-gloss">Semi-Gloss</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -158,11 +265,43 @@
                     </div>
                     <div class="form-group">
                         <label for="editFiveGallons">5 Gallon Buckets:</label>
-                        <input type="number" id="editFiveGallons" min="0" value="0">
+                        <div class="quantity-container">
+                            <input type="number" id="editFiveGallons" min="0" value="0">
+                            <div class="partial-container">
+                                <input type="checkbox" id="editFiveGallonPartials">
+                                <label for="editFiveGallonPartials">Partials</label>
+                                <input type="number" 
+                                       id="editFiveGallonPartialsQty" 
+                                       min="0" 
+                                       value="0" 
+                                       class="partial-qty" 
+                                       style="display: none;">
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="editSingleGallons">1 Gallon Cans:</label>
-                        <input type="number" id="editSingleGallons" min="0" value="0">
+                        <div class="quantity-container">
+                            <input type="number" id="editSingleGallons" min="0" value="0">
+                            <div class="partial-container">
+                                <input type="checkbox" id="editSingleGallonPartials">
+                                <label for="editSingleGallonPartials">Partials</label>
+                                <input type="number" 
+                                       id="editSingleGallonPartialsQty" 
+                                       min="0" 
+                                       value="0" 
+                                       class="partial-qty" 
+                                       style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editQuarts">Quarts:</label>
+                        <input type="number" id="editQuarts" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPints">Pints:</label>
+                        <input type="number" id="editPints" min="0" value="0">
                     </div>
                     <!-- Add barcode scanner viewport -->
                     <div id="editBarcodeScanner" class="scanner-viewport" style="display: none;">
