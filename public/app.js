@@ -28,6 +28,7 @@ function displayInventory() {
             
             // Calculate total volume in gallons, using 0 for undefined values
             const fiveGallons = item.fiveGallons || 0;
+            const twoGallons = item.twoGallons || 0;
             const singleGallons = item.singleGallons || 0;
             const quarts = item.quarts || 0;
             const pints = item.pints || 0;
@@ -35,6 +36,7 @@ function displayInventory() {
             const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
             
             const totalVolume = (fiveGallons * 5) + 
+                              (twoGallons * 2) +
                               (singleGallons * 1) + 
                               (quarts * 0.25) + 
                               (pints * 0.125);
@@ -63,6 +65,7 @@ function displayInventory() {
                 <p>Type: ${item.type}</p>
                 <p>Sheen: ${item.sheen || 'N/A'}</p>
                 <p>Stock: ${fiveGallons} × 5gal${item.fiveGallonPartials ? ` + ${fiveGallonPartialsQty} partials` : ''}, 
+                         ${twoGallons} × 2gal${item.twoGallonPartials ? ` + ${twoGallonPartialsQty} partials` : ''}, 
                          ${singleGallons} × 1gal${item.singleGallonPartials ? ` + ${singleGallonPartialsQty} partials` : ''}, 
                          ${quarts} × qt, 
                          ${pints} × pt</p>
@@ -194,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Calculate total volume in gallons
                 const fiveGallons = item.fiveGallons || 0;
+                const twoGallons = item.twoGallons || 0;
                 const singleGallons = item.singleGallons || 0;
                 const quarts = item.quarts || 0;
                 const pints = item.pints || 0;
@@ -201,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
                 
                 const totalVolume = (fiveGallons * 5) + 
+                                  (twoGallons * 2) +
                                   (singleGallons * 1) + 
                                   (quarts * 0.25) + 
                                   (pints * 0.125);
@@ -229,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>Type: ${item.type}</p>
                     <p>Sheen: ${item.sheen || 'N/A'}</p>
                     <p>Stock: ${fiveGallons} × 5gal${item.fiveGallonPartials ? ` + ${fiveGallonPartialsQty} partials` : ''}, 
+                             ${twoGallons} × 2gal${item.twoGallonPartials ? ` + ${twoGallonPartialsQty} partials` : ''}, 
                              ${singleGallons} × 1gal${item.singleGallonPartials ? ` + ${singleGallonPartialsQty} partials` : ''}, 
                              ${quarts} × qt, 
                              ${pints} × pt</p>
@@ -278,6 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
             singleGallonPartials: document.getElementById('editSingleGallonPartials').checked,
             fiveGallonPartialsQty: parseInt(document.getElementById('editFiveGallonPartialsQty').value) || 0,
             singleGallonPartialsQty: parseInt(document.getElementById('editSingleGallonPartialsQty').value) || 0,
+            twoGallons: parseInt(document.getElementById('editTwoGallons').value) || 0,
+            twoGallonPartials: document.getElementById('editTwoGallonPartials').checked,
+            twoGallonPartialsQty: parseInt(document.getElementById('editTwoGallonPartialsQty').value) || 0,
             timestamp: Date.now()
         };
 
@@ -316,6 +325,74 @@ document.addEventListener('DOMContentLoaded', function() {
             editForm.reset();
         }
     });
+
+    // Add this function to handle partial quantity toggles
+    function setupPartialQuantities() {
+        // For add form
+        const fiveGallonPartialsCheck = document.getElementById('fiveGallonPartials');
+        const fiveGallonPartialsQty = document.getElementById('fiveGallonPartialsQty');
+        const singleGallonPartialsCheck = document.getElementById('singleGallonPartials');
+        const singleGallonPartialsQty = document.getElementById('singleGallonPartialsQty');
+
+        // For edit form
+        const editFiveGallonPartialsCheck = document.getElementById('editFiveGallonPartials');
+        const editFiveGallonPartialsQty = document.getElementById('editFiveGallonPartialsQty');
+        const editSingleGallonPartialsCheck = document.getElementById('editSingleGallonPartials');
+        const editSingleGallonPartialsQty = document.getElementById('editSingleGallonPartialsQty');
+
+        // Add two gallon partials
+        const twoGallonPartialsCheck = document.getElementById('twoGallonPartials');
+        const twoGallonPartialsQty = document.getElementById('twoGallonPartialsQty');
+        const editTwoGallonPartialsCheck = document.getElementById('editTwoGallonPartials');
+        const editTwoGallonPartialsQty = document.getElementById('editTwoGallonPartialsQty');
+
+        // Add form listeners
+        if (fiveGallonPartialsCheck && fiveGallonPartialsQty) {
+            fiveGallonPartialsCheck.addEventListener('change', function() {
+                fiveGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) fiveGallonPartialsQty.value = 0;
+            });
+        }
+
+        if (singleGallonPartialsCheck && singleGallonPartialsQty) {
+            singleGallonPartialsCheck.addEventListener('change', function() {
+                singleGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) singleGallonPartialsQty.value = 0;
+            });
+        }
+
+        // Edit form listeners
+        if (editFiveGallonPartialsCheck && editFiveGallonPartialsQty) {
+            editFiveGallonPartialsCheck.addEventListener('change', function() {
+                editFiveGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) editFiveGallonPartialsQty.value = 0;
+            });
+        }
+
+        if (editSingleGallonPartialsCheck && editSingleGallonPartialsQty) {
+            editSingleGallonPartialsCheck.addEventListener('change', function() {
+                editSingleGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) editSingleGallonPartialsQty.value = 0;
+            });
+        }
+
+        // Add event listeners for two gallon partials
+        if (twoGallonPartialsCheck && twoGallonPartialsQty) {
+            twoGallonPartialsCheck.addEventListener('change', function() {
+                twoGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) twoGallonPartialsQty.value = 0;
+            });
+        }
+
+        if (editTwoGallonPartialsCheck && editTwoGallonPartialsQty) {
+            editTwoGallonPartialsCheck.addEventListener('change', function() {
+                editTwoGallonPartialsQty.style.display = this.checked ? 'inline-block' : 'none';
+                if (!this.checked) editTwoGallonPartialsQty.value = 0;
+            });
+        }
+    }
+
+    setupPartialQuantities();
 });
 
 // DOM Elements - declare all at once at the top
@@ -647,6 +724,7 @@ function updateKnownBrands() {
 function displayInventoryItem(itemKey, item, container) {
     // Your existing item display logic here
     const fiveGallons = item.fiveGallons || 0;
+    const twoGallons = item.twoGallons || 0;
     const singleGallons = item.singleGallons || 0;
     const quarts = item.quarts || 0;
     const pints = item.pints || 0;
@@ -654,6 +732,7 @@ function displayInventoryItem(itemKey, item, container) {
     const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
     
     const totalVolume = (fiveGallons * 5) + 
+                      (twoGallons * 2) +
                       (singleGallons * 1) + 
                       (quarts * 0.25) + 
                       (pints * 0.125);
@@ -681,6 +760,7 @@ function displayInventoryItem(itemKey, item, container) {
         <p>Type: ${item.type}</p>
         <p>Sheen: ${item.sheen || 'N/A'}</p>
         <p>Stock: ${fiveGallons} × 5gal${item.fiveGallonPartials ? ` + ${fiveGallonPartialsQty} partials` : ''}, 
+                 ${twoGallons} × 2gal${item.twoGallonPartials ? ` + ${twoGallonPartialsQty} partials` : ''}, 
                  ${singleGallons} × 1gal${item.singleGallonPartials ? ` + ${singleGallonPartialsQty} partials` : ''}, 
                  ${quarts} × qt, 
                  ${pints} × pt</p>
@@ -749,6 +829,7 @@ function setupFilterAndSort() {
             items.forEach(item => {
                 // Use existing display logic
                 const fiveGallons = item.fiveGallons || 0;
+                const twoGallons = item.twoGallons || 0;
                 const singleGallons = item.singleGallons || 0;
                 const quarts = item.quarts || 0;
                 const pints = item.pints || 0;
@@ -756,6 +837,7 @@ function setupFilterAndSort() {
                 const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
                 
                 const totalVolume = (fiveGallons * 5) + 
+                                  (twoGallons * 2) +
                                   (singleGallons * 1) + 
                                   (quarts * 0.25) + 
                                   (pints * 0.125);
@@ -783,6 +865,7 @@ function setupFilterAndSort() {
                     <p>Type: ${item.type}</p>
                     <p>Sheen: ${item.sheen || 'N/A'}</p>
                     <p>Stock: ${fiveGallons} × 5gal${item.fiveGallonPartials ? ` + ${fiveGallonPartialsQty} partials` : ''}, 
+                             ${twoGallons} × 2gal${item.twoGallonPartials ? ` + ${twoGallonPartialsQty} partials` : ''}, 
                              ${singleGallons} × 1gal${item.singleGallonPartials ? ` + ${singleGallonPartialsQty} partials` : ''}, 
                              ${quarts} × qt, 
                              ${pints} × pt</p>
@@ -803,16 +886,18 @@ function setupFilterAndSort() {
     sortBy.addEventListener('change', applyFilterAndSort);
 }
 
-// Add this function to check for duplicates
+// Update the duplicate check function
 function checkForDuplicate(newItem) {
     return new Promise((resolve, reject) => {
         db.ref('inventory').once('value', (snapshot) => {
             let isDuplicate = false;
             snapshot.forEach((child) => {
                 const item = child.val();
+                // Check if name, brand, color AND sheen all match
                 if (item.name.toLowerCase() === newItem.name.toLowerCase() &&
                     item.brand.toLowerCase() === newItem.brand.toLowerCase() &&
-                    item.color.toLowerCase() === newItem.color.toLowerCase()) {
+                    item.color.toLowerCase() === newItem.color.toLowerCase() &&
+                    item.sheen.toLowerCase() === newItem.sheen.toLowerCase()) {
                     isDuplicate = true;
                 }
             });
@@ -835,20 +920,27 @@ addItemForm.addEventListener('submit', async function(e) {
         singleGallons: parseInt(document.getElementById('singleGallons').value) || 0,
         quarts: parseInt(document.getElementById('quarts').value) || 0,
         pints: parseInt(document.getElementById('pints').value) || 0,
+        fiveGallonPartials: document.getElementById('fiveGallonPartials').checked,
+        singleGallonPartials: document.getElementById('singleGallonPartials').checked,
+        fiveGallonPartialsQty: parseInt(document.getElementById('fiveGallonPartialsQty').value) || 0,
+        singleGallonPartialsQty: parseInt(document.getElementById('singleGallonPartialsQty').value) || 0,
+        twoGallons: parseInt(document.getElementById('twoGallons').value) || 0,
+        twoGallonPartials: document.getElementById('twoGallonPartials').checked,
+        twoGallonPartialsQty: parseInt(document.getElementById('twoGallonPartialsQty').value) || 0,
         timestamp: Date.now()
     };
 
-    // Check for duplicates before adding
+    // Check for exact duplicates (including sheen)
     const isDuplicate = await checkForDuplicate(newItem);
     if (isDuplicate) {
-        alert('This paint already exists in the inventory!');
+        alert('This exact paint (including sheen) already exists in the inventory!');
         return;
     }
 
     // If not a duplicate, add to database
     db.ref('inventory').push(newItem)
         .then(() => {
-            document.getElementById('addModal').style.display = 'none';
+            addModal.style.display = 'none';
             addItemForm.reset();
         })
         .catch((error) => {
@@ -884,6 +976,7 @@ function setupSearch() {
                 if (searchTerm === '' || matchesSearch) {
                     // Use the existing displayInventoryItem function
                     const fiveGallons = item.fiveGallons || 0;
+                    const twoGallons = item.twoGallons || 0;
                     const singleGallons = item.singleGallons || 0;
                     const quarts = item.quarts || 0;
                     const pints = item.pints || 0;
@@ -891,6 +984,7 @@ function setupSearch() {
                     const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
                     
                     const totalVolume = (fiveGallons * 5) + 
+                                      (twoGallons * 2) +
                                       (singleGallons * 1) + 
                                       (quarts * 0.25) + 
                                       (pints * 0.125);
@@ -918,6 +1012,7 @@ function setupSearch() {
                         <p>Type: ${item.type}</p>
                         <p>Sheen: ${item.sheen || 'N/A'}</p>
                         <p>Stock: ${fiveGallons} × 5gal${item.fiveGallonPartials ? ` + ${fiveGallonPartialsQty} partials` : ''}, 
+                                 ${twoGallons} × 2gal${item.twoGallonPartials ? ` + ${twoGallonPartialsQty} partials` : ''}, 
                                  ${singleGallons} × 1gal${item.singleGallonPartials ? ` + ${singleGallonPartialsQty} partials` : ''}, 
                                  ${quarts} × qt, 
                                  ${pints} × pt</p>

@@ -32,6 +32,24 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0.5rem 2rem;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo {
+    height: 40px;  /* Made slightly larger */
+    width: auto;
+    object-fit: contain;
+}
+
+h1 {
+    font-size: 1.5rem;  /* Adjusted to match your screenshot */
+    margin: 0;
+    color: var(--text-color);
 }
 
 .nav-buttons {
@@ -363,16 +381,21 @@ button {
     top: 0;
 }
 
-.partial-qty {
-    width: 60px;
-    padding: 4px;
-    margin-left: 8px;
-}
-
 .partial-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.partial-qty {
+    width: 60px !important;
+    display: none;
+}
+
+.quantity-container {
+    display: flex;
+    align-items: center;
 }
 
 .filter-sort-container {
@@ -408,6 +431,16 @@ button {
     
     .filter-group select {
         width: 100%;
+    }
+    
+    .nav-left {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .nav-logo {
+        height: 30px;  /* Slightly smaller on mobile */
     }
 }
 
