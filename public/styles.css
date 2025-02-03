@@ -461,4 +461,30 @@ button {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 1px 3px rgba(19, 87, 64, 0.2);
+}
+
+.welcome-modal {
+    text-align: center;
+    padding: 3rem;  /* Increased padding */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.welcome-logo {
+    width: 300px;  /* Increased from 200px to 300px */
+    height: auto;
+    margin-bottom: 2rem;  /* Increased margin */
+}
+
+.welcome-modal h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;  /* Made text larger too */
+}
+
+.welcome-modal p {
+    color: #666;
+    font-size: 1.2rem;  /* Slightly larger text */
 } 

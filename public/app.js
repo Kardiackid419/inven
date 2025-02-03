@@ -26,32 +26,40 @@ function displayInventory() {
             const item = child.val();
             const itemKey = child.key;
             
-            // Calculate total volume in gallons, using 0 for undefined values
+            // Calculate total volume including partials
             const fiveGallons = item.fiveGallons || 0;
             const twoGallons = item.twoGallons || 0;
             const singleGallons = item.singleGallons || 0;
             const quarts = item.quarts || 0;
             const pints = item.pints || 0;
             const fiveGallonPartialsQty = item.fiveGallonPartialsQty || 0;
+            const twoGallonPartialsQty = item.twoGallonPartialsQty || 0;
             const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
             
             const totalVolume = (fiveGallons * 5) + 
-                              (twoGallons * 2) +
+                              (twoGallons * 2) + 
                               (singleGallons * 1) + 
                               (quarts * 0.25) + 
-                              (pints * 0.125);
-            
-            // Create partials text only if there are partials
+                              (pints * 0.125) +
+                              (fiveGallonPartialsQty * 5) +
+                              (twoGallonPartialsQty * 2) +
+                              (singleGallonPartialsQty * 1);
+
+            // Create partials text
             const partialsText = [];
             if (item.fiveGallonPartials && fiveGallonPartialsQty > 0) {
                 partialsText.push(`${fiveGallonPartialsQty} × 5gal`);
             }
+            if (item.twoGallonPartials && twoGallonPartialsQty > 0) {
+                partialsText.push(`${twoGallonPartialsQty} × 2gal`);
+            }
             if (item.singleGallonPartials && singleGallonPartialsQty > 0) {
                 partialsText.push(`${singleGallonPartialsQty} × 1gal`);
             }
+            
             const partialsDisplay = partialsText.length > 0 ? 
                 `<div class="partials-count">+${partialsText.join(', ')}</div>` : '';
-            
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'inventory-item';
             itemDiv.innerHTML = `
@@ -71,7 +79,6 @@ function displayInventory() {
                          ${pints} × pt</p>
             `;
             
-            // Add click handler to open edit modal
             itemDiv.addEventListener('click', () => {
                 openEditModal(itemKey, item);
             });
@@ -86,22 +93,33 @@ function openEditModal(itemKey, item) {
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editItemForm');
     
-    // Fill form with current values
+    // Set form values
     document.getElementById('editPaintName').value = item.name;
     document.getElementById('editPaintBrand').value = item.brand;
     document.getElementById('editPaintColor').value = item.color;
     document.getElementById('editPaintType').value = item.type;
-    document.getElementById('editPaintSheen').value = item.sheen || '';
-    document.getElementById('editFiveGallons').value = item.fiveGallons;
-    document.getElementById('editSingleGallons').value = item.singleGallons;
+    document.getElementById('editPaintSheen').value = item.sheen;
+    document.getElementById('editFiveGallons').value = item.fiveGallons || 0;
+    document.getElementById('editTwoGallons').value = item.twoGallons || 0;
+    document.getElementById('editSingleGallons').value = item.singleGallons || 0;
     document.getElementById('editQuarts').value = item.quarts || 0;
     document.getElementById('editPints').value = item.pints || 0;
-    document.getElementById('editBarcode').value = item.barcode || '';
     
-    // Store the item key in the form
+    // Set partials checkboxes and quantities
+    document.getElementById('editFiveGallonPartials').checked = item.fiveGallonPartials || false;
+    document.getElementById('editTwoGallonPartials').checked = item.twoGallonPartials || false;
+    document.getElementById('editSingleGallonPartials').checked = item.singleGallonPartials || false;
+    
+    document.getElementById('editFiveGallonPartialsQty').value = item.fiveGallonPartialsQty || 0;
+    document.getElementById('editTwoGallonPartialsQty').value = item.twoGallonPartialsQty || 0;
+    document.getElementById('editSingleGallonPartialsQty').value = item.singleGallonPartialsQty || 0;
+    
+    // Show/hide partial quantity inputs based on checkboxes
+    document.getElementById('editFiveGallonPartialsQty').style.display = item.fiveGallonPartials ? 'inline-block' : 'none';
+    document.getElementById('editTwoGallonPartialsQty').style.display = item.twoGallonPartials ? 'inline-block' : 'none';
+    document.getElementById('editSingleGallonPartialsQty').style.display = item.singleGallonPartials ? 'inline-block' : 'none';
+    
     editForm.dataset.itemKey = itemKey;
-    
-    // Show the modal
     editModal.style.display = 'block';
 }
 
@@ -195,29 +213,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 const item = child.val();
                 const itemKey = child.key;
                 
-                // Calculate total volume in gallons
+                // Calculate total volume including partials
                 const fiveGallons = item.fiveGallons || 0;
                 const twoGallons = item.twoGallons || 0;
                 const singleGallons = item.singleGallons || 0;
                 const quarts = item.quarts || 0;
                 const pints = item.pints || 0;
                 const fiveGallonPartialsQty = item.fiveGallonPartialsQty || 0;
+                const twoGallonPartialsQty = item.twoGallonPartialsQty || 0;
                 const singleGallonPartialsQty = item.singleGallonPartialsQty || 0;
                 
                 const totalVolume = (fiveGallons * 5) + 
-                                  (twoGallons * 2) +
+                                  (twoGallons * 2) + 
                                   (singleGallons * 1) + 
                                   (quarts * 0.25) + 
-                                  (pints * 0.125);
-                
+                                  (pints * 0.125) +
+                                  (fiveGallonPartialsQty * 5) +
+                                  (twoGallonPartialsQty * 2) +
+                                  (singleGallonPartialsQty * 1);
+
                 // Create partials text
                 const partialsText = [];
                 if (item.fiveGallonPartials && fiveGallonPartialsQty > 0) {
                     partialsText.push(`${fiveGallonPartialsQty} × 5gal`);
                 }
+                if (item.twoGallonPartials && twoGallonPartialsQty > 0) {
+                    partialsText.push(`${twoGallonPartialsQty} × 2gal`);
+                }
                 if (item.singleGallonPartials && singleGallonPartialsQty > 0) {
                     partialsText.push(`${singleGallonPartialsQty} × 1gal`);
                 }
+                
                 const partialsDisplay = partialsText.length > 0 ? 
                     `<div class="partials-count">+${partialsText.join(', ')}</div>` : '';
 
@@ -264,42 +290,72 @@ document.addEventListener('DOMContentLoaded', function() {
         editForm.reset();
     });
 
-    // Save changes in edit modal
+    // Update the edit form submission handler
     editForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const itemKey = this.dataset.itemKey;
-        const updatedItem = {
-            name: document.getElementById('editPaintName').value,
-            brand: document.getElementById('editPaintBrand').value,
-            color: document.getElementById('editPaintColor').value,
-            type: document.getElementById('editPaintType').value,
-            sheen: document.getElementById('editPaintSheen').value,
-            fiveGallons: parseInt(document.getElementById('editFiveGallons').value) || 0,
-            singleGallons: parseInt(document.getElementById('editSingleGallons').value) || 0,
-            quarts: parseInt(document.getElementById('editQuarts').value) || 0,
-            pints: parseInt(document.getElementById('editPints').value) || 0,
-            barcode: document.getElementById('editBarcode').value,
-            fiveGallonPartials: document.getElementById('editFiveGallonPartials').checked,
-            singleGallonPartials: document.getElementById('editSingleGallonPartials').checked,
-            fiveGallonPartialsQty: parseInt(document.getElementById('editFiveGallonPartialsQty').value) || 0,
-            singleGallonPartialsQty: parseInt(document.getElementById('editSingleGallonPartialsQty').value) || 0,
-            twoGallons: parseInt(document.getElementById('editTwoGallons').value) || 0,
-            twoGallonPartials: document.getElementById('editTwoGallonPartials').checked,
-            twoGallonPartialsQty: parseInt(document.getElementById('editTwoGallonPartialsQty').value) || 0,
-            timestamp: Date.now()
-        };
+        const editModal = document.getElementById('editModal');
+        
+        // First, get the current item data
+        db.ref('inventory').child(itemKey).once('value', (snapshot) => {
+            const currentItem = snapshot.val();
+            
+            // Get all the form values
+            const newFiveGallons = document.getElementById('editFiveGallons').value;
+            const newTwoGallons = document.getElementById('editTwoGallons').value;
+            const newSingleGallons = document.getElementById('editSingleGallons').value;
+            const newQuarts = document.getElementById('editQuarts').value;
+            const newPints = document.getElementById('editPints').value;
+            
+            // Create updated item
+            const updatedItem = {
+                name: document.getElementById('editPaintName').value,
+                brand: document.getElementById('editPaintBrand').value,
+                color: document.getElementById('editPaintColor').value,
+                type: document.getElementById('editPaintType').value,
+                sheen: document.getElementById('editPaintSheen').value,
+                
+                // Use the new values directly, don't check for 0
+                fiveGallons: parseInt(newFiveGallons),
+                twoGallons: parseInt(newTwoGallons),
+                singleGallons: parseInt(newSingleGallons),
+                quarts: parseInt(newQuarts),
+                pints: parseInt(newPints),
+                
+                // Partials checkboxes
+                fiveGallonPartials: document.getElementById('editFiveGallonPartials').checked,
+                twoGallonPartials: document.getElementById('editTwoGallonPartials').checked,
+                singleGallonPartials: document.getElementById('editSingleGallonPartials').checked,
+                
+                // Partial quantities
+                fiveGallonPartialsQty: parseInt(document.getElementById('editFiveGallonPartialsQty').value) || 0,
+                twoGallonPartialsQty: parseInt(document.getElementById('editTwoGallonPartialsQty').value) || 0,
+                singleGallonPartialsQty: parseInt(document.getElementById('editSingleGallonPartialsQty').value) || 0,
+                
+                // Add timestamp
+                timestamp: Date.now()
+            };
 
-        // Update the item in Firebase
-        db.ref('inventory').child(itemKey).update(updatedItem)
-            .then(() => {
-                editModal.style.display = 'none';
-                editForm.reset();
-            })
-            .catch((error) => {
-                console.error('Error updating item:', error);
-                alert('Error updating item. Please try again.');
+            // Ensure all number values are at least 0
+            Object.keys(updatedItem).forEach(key => {
+                if (typeof updatedItem[key] === 'number' && isNaN(updatedItem[key])) {
+                    updatedItem[key] = 0;
+                }
             });
+
+            // Update in Firebase
+            db.ref('inventory').child(itemKey).update(updatedItem)
+                .then(() => {
+                    console.log('Successfully updated item');
+                    editModal.style.display = 'none';
+                    this.reset();
+                })
+                .catch((error) => {
+                    console.error('Error updating item:', error);
+                    alert('Error updating item. Please try again.');
+                });
+        });
     });
 
     // Delete button in edit modal
