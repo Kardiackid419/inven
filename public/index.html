@@ -63,6 +63,7 @@
                 <option value="flat">Flat</option>
                 <option value="gloss">Gloss</option>
                 <option value="high-gloss">High Gloss</option>
+                <option value="low-sheen">Low-Sheen</option>
                 <option value="matte">Matte</option>
                 <option value="satin">Satin</option>
                 <option value="semi-gloss">Semi-Gloss</option>
@@ -127,6 +128,7 @@
                             <option value="flat">Flat</option>
                             <option value="gloss">Gloss</option>
                             <option value="high-gloss">High Gloss</option>
+                            <option value="low-sheen">Low-Sheen</option>
                             <option value="matte">Matte</option>
                             <option value="satin">Satin</option>
                             <option value="semi-gloss">Semi-Gloss</option>
@@ -184,11 +186,25 @@
 
         <!-- Scanner Modal -->
         <div id="scanModal" class="modal">
-            <div class="modal-content">
-                <h3>Scan Barcode</h3>
-                <div id="interactive" class="viewport"></div>
-                <div id="scanResult"></div>
-                <button class="close-modal">Cancel</button>
+            <div class="modal-content scan-content">
+                <span class="close-modal">&times;</span>
+                <div class="scan-waiting">
+                    <i class="fas fa-barcode scan-icon"></i>
+                    <h2>Waiting for Scan...</h2>
+                    <input type="text" id="barcodeInput" autofocus style="opacity: 0; position: absolute;">
+                </div>
+                <div id="scanResult" class="scan-result"></div>
+                <div id="noMatchOptions" style="display: none;">
+                    <h3>Barcode not found</h3>
+                    <div class="option-buttons">
+                        <button onclick="openAddModal(currentBarcode)" class="primary-button">
+                            <i class="fas fa-plus"></i> Add New Item
+                        </button>
+                        <button onclick="openLinkBarcodeModal(currentBarcode)" class="secondary-button">
+                            <i class="fas fa-link"></i> Link to Existing Item
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -260,6 +276,7 @@
                             <option value="flat">Flat</option>
                             <option value="gloss">Gloss</option>
                             <option value="high-gloss">High Gloss</option>
+                            <option value="low-sheen">Low-Sheen</option>
                             <option value="matte">Matte</option>
                             <option value="satin">Satin</option>
                             <option value="semi-gloss">Semi-Gloss</option>
@@ -330,6 +347,19 @@
             </div>
         </div>
 
+        <!-- Add Link Barcode Modal -->
+        <div id="linkBarcodeModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Link Barcode to Existing Item</h2>
+                <div class="search-container">
+                    <input type="text" id="linkSearchInput" placeholder="Search for item...">
+                </div>
+                <div id="linkSearchResults" class="search-results"></div>
+            </div>
+        </div>
+
+    </main>
 
     <!-- Add these Firebase SDK scripts BEFORE app.js -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>

@@ -16,6 +16,7 @@ const db = firebase.database();
 
 // Add this at the top with other global variables
 let knownBrands = new Set();
+let currentBarcode = '';
 
 // Function to display inventory items
 function displayInventory() {
@@ -187,7 +188,105 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     scanButton.addEventListener('click', () => {
+        const scanModal = document.getElementById('scanModal');
+        const barcodeInput = document.getElementById('barcodeInput');
+        const scanResult = document.getElementById('scanResult');
+        const noMatchOptions = document.getElementById('noMatchOptions');
+        
+        // Reset everything
+        scanResult.innerHTML = '';
+        noMatchOptions.style.display = 'none';
+        barcodeInput.value = '';
+        currentBarcode = '';
+        
+        // Show modal and focus input
         scanModal.style.display = 'block';
+        barcodeInput.focus();
+
+        // Handle barcode input
+        barcodeInput.addEventListener('input', function() {
+            setTimeout(() => {
+                const barcode = this.value.trim();
+                if (barcode) {
+                    currentBarcode = barcode;
+                    
+                    db.ref('inventory').orderByChild('barcode').equalTo(barcode).once('value')
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                snapshot.forEach((child) => {
+                                    const item = child.val();
+                                    if (scanResult) {
+                                        scanResult.innerHTML = `
+                                            <div class="scan-result-item">
+                                                <div class="item-info">
+                                                    <h3>${item.name}</h3>
+                                                    <p>Brand: ${item.brand}</p>
+                                                    <p>Color: ${item.color}</p>
+                                                    <p>Type: ${item.type}</p>
+                                                    <p>Sheen: ${item.sheen || 'N/A'}</p>
+                                                </div>
+                                                
+                                                <div class="quick-adjust">
+                                                    <div class="quantity-row">
+                                                        <span>5 Gallon:</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'fiveGallons', -1, event)" class="qty-btn">-</button>
+                                                        <span class="quantity-value">${item.fiveGallons || 0}</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'fiveGallons', 1, event)" class="qty-btn">+</button>
+                                                    </div>
+                                                    
+                                                    <div class="quantity-row">
+                                                        <span>2 Gallon:</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'twoGallons', -1, event)" class="qty-btn">-</button>
+                                                        <span class="quantity-value">${item.twoGallons || 0}</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'twoGallons', 1, event)" class="qty-btn">+</button>
+                                                    </div>
+                                                    
+                                                    <div class="quantity-row">
+                                                        <span>1 Gallon:</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'singleGallons', -1, event)" class="qty-btn">-</button>
+                                                        <span class="quantity-value">${item.singleGallons || 0}</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'singleGallons', 1, event)" class="qty-btn">+</button>
+                                                    </div>
+                                                    
+                                                    <div class="quantity-row">
+                                                        <span>Quarts:</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'quarts', -1, event)" class="qty-btn">-</button>
+                                                        <span class="quantity-value">${item.quarts || 0}</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'quarts', 1, event)" class="qty-btn">+</button>
+                                                    </div>
+                                                    
+                                                    <div class="quantity-row">
+                                                        <span>Pints:</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'pints', -1, event)" class="qty-btn">-</button>
+                                                        <span class="quantity-value">${item.pints || 0}</span>
+                                                        <button onclick="adjustQuantity('${child.key}', 'pints', 1, event)" class="qty-btn">+</button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="scan-actions">
+                                                    <button onclick="openEditModal('${child.key}', ${JSON.stringify(item)})" class="edit-button">
+                                                        Full Edit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }
+                                });
+                            } else {
+                                if (noMatchOptions) {
+                                    noMatchOptions.style.display = 'block';
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error searching for barcode:', error);
+                            if (scanResult) {
+                                scanResult.innerHTML = '<p class="error">Error searching for item</p>';
+                            }
+                        });
+                }
+            }, 100);
+        });
     });
 
     reportsButton.addEventListener('click', () => {
@@ -291,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Update the edit form submission handler
-    editForm.addEventListener('submit', function(e) {
+    document.getElementById('editItemForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const itemKey = this.dataset.itemKey;
@@ -301,14 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
         db.ref('inventory').child(itemKey).once('value', (snapshot) => {
             const currentItem = snapshot.val();
             
-            // Get all the form values
-            const newFiveGallons = document.getElementById('editFiveGallons').value;
-            const newTwoGallons = document.getElementById('editTwoGallons').value;
-            const newSingleGallons = document.getElementById('editSingleGallons').value;
-            const newQuarts = document.getElementById('editQuarts').value;
-            const newPints = document.getElementById('editPints').value;
-            
-            // Create updated item
+            // Create updated item, preserving existing quantities
             const updatedItem = {
                 name: document.getElementById('editPaintName').value,
                 brand: document.getElementById('editPaintBrand').value,
@@ -316,12 +408,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: document.getElementById('editPaintType').value,
                 sheen: document.getElementById('editPaintSheen').value,
                 
-                // Use the new values directly, don't check for 0
-                fiveGallons: parseInt(newFiveGallons),
-                twoGallons: parseInt(newTwoGallons),
-                singleGallons: parseInt(newSingleGallons),
-                quarts: parseInt(newQuarts),
-                pints: parseInt(newPints),
+                // Quantities - use new value if entered, otherwise keep existing
+                fiveGallons: parseInt(document.getElementById('editFiveGallons').value) || currentItem.fiveGallons || 0,
+                twoGallons: parseInt(document.getElementById('editTwoGallons').value) || currentItem.twoGallons || 0,
+                singleGallons: parseInt(document.getElementById('editSingleGallons').value) || currentItem.singleGallons || 0,
+                quarts: parseInt(document.getElementById('editQuarts').value) || currentItem.quarts || 0,
+                pints: parseInt(document.getElementById('editPints').value) || currentItem.pints || 0,
                 
                 // Partials checkboxes
                 fiveGallonPartials: document.getElementById('editFiveGallonPartials').checked,
@@ -336,13 +428,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add timestamp
                 timestamp: Date.now()
             };
-
-            // Ensure all number values are at least 0
-            Object.keys(updatedItem).forEach(key => {
-                if (typeof updatedItem[key] === 'number' && isNaN(updatedItem[key])) {
-                    updatedItem[key] = 0;
-                }
-            });
 
             // Update in Firebase
             db.ref('inventory').child(itemKey).update(updatedItem)
@@ -1083,4 +1168,138 @@ function setupSearch() {
             });
         });
     });
+}
+
+// Add this function to open add modal with barcode
+function openAddModal(barcode) {
+    const addModal = document.getElementById('addModal');
+    const scanModal = document.getElementById('scanModal');
+    const barcodeInput = document.getElementById('barcode');
+    
+    scanModal.style.display = 'none';
+    addModal.style.display = 'block';
+    
+    if (barcodeInput) {
+        barcodeInput.value = barcode;
+    }
+}
+
+// Update close modal handler
+document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('scanModal').style.display = 'none';
+    document.getElementById('scanStatus').textContent = 'Waiting for scan...';
+    document.getElementById('scanResult').innerHTML = '';
+});
+
+// Function to open link barcode modal
+function openLinkBarcodeModal(barcode) {
+    const linkModal = document.getElementById('linkBarcodeModal');
+    const scanModal = document.getElementById('scanModal');
+    const searchInput = document.getElementById('linkSearchInput');
+    const resultsDiv = document.getElementById('linkSearchResults');
+    
+    scanModal.style.display = 'none';
+    linkModal.style.display = 'block';
+    searchInput.focus();
+    
+    // Handle search input
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        db.ref('inventory').once('value', (snapshot) => {
+            resultsDiv.innerHTML = '';
+            snapshot.forEach((child) => {
+                const item = child.val();
+                if (item.name.toLowerCase().includes(searchTerm) ||
+                    item.brand.toLowerCase().includes(searchTerm) ||
+                    item.color.toLowerCase().includes(searchTerm)) {
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'search-result-item';
+                    itemDiv.innerHTML = `
+                        <div class="item-details">
+                            <h4>${item.name}</h4>
+                            <p>${item.brand} - ${item.color}</p>
+                            <p>Sheen: ${item.sheen || 'N/A'}</p>
+                        </div>
+                        <button onclick="linkBarcodeToItem('${child.key}', '${barcode}')" class="link-button">
+                            Link Barcode
+                        </button>
+                    `;
+                    
+                    resultsDiv.appendChild(itemDiv);
+                }
+            });
+        });
+    });
+}
+
+// Function to link barcode to existing item
+function linkBarcodeToItem(itemKey, barcode) {
+    console.log('Linking barcode:', barcode, 'to item:', itemKey); // Debug log
+    
+    db.ref(`inventory/${itemKey}`).update({
+        barcode: barcode
+    }).then(() => {
+        // Close both modals
+        document.getElementById('linkBarcodeModal').style.display = 'none';
+        document.getElementById('scanModal').style.display = 'none';
+        alert('Barcode linked successfully!');
+        
+        // Optional: Refresh the inventory display
+        displayInventory();
+    }).catch((error) => {
+        console.error('Error linking barcode:', error);
+        alert('Error linking barcode. Please try again.');
+    });
+}
+
+// Update the adjustQuantity function with better error handling and logging
+function adjustQuantity(itemKey, field, change, event) {
+    // Add debug logging
+    console.log('Adjusting quantity:', {itemKey, field, change});
+    
+    // Get the database reference
+    const itemRef = db.ref(`inventory/${itemKey}`);
+    
+    // Get current value and update
+    itemRef.once('value')
+        .then((snapshot) => {
+            if (!snapshot.exists()) {
+                throw new Error('Item not found');
+            }
+            
+            const item = snapshot.val();
+            console.log('Current item:', item);
+            
+            const currentValue = parseInt(item[field]) || 0;
+            const newValue = Math.max(0, currentValue + change);
+            
+            console.log('Values:', {currentValue, newValue});
+            
+            // Update the value
+            return itemRef.update({
+                [field]: newValue,
+                timestamp: Date.now()
+            });
+        })
+        .then(() => {
+            console.log('Update successful');
+            
+            // Update the display
+            const button = event.target;
+            const quantityElement = button.parentElement.querySelector('.quantity-value');
+            if (quantityElement) {
+                const currentDisplayValue = parseInt(quantityElement.textContent) || 0;
+                const newDisplayValue = Math.max(0, currentDisplayValue + change);
+                quantityElement.textContent = newDisplayValue;
+            }
+            
+            // Refresh inventory display
+            displayInventory();
+        })
+        .catch((error) => {
+            console.error('Error in adjustQuantity:', error);
+            alert('Error updating quantity. Please try again.');
+        });
 } 
