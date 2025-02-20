@@ -7,6 +7,40 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Make modal scrollable */
+        .modal-dialog {
+            max-height: 85vh;  /* Reduced from 90vh to give more space */
+        }
+
+        .modal-content {
+            height: auto;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding-bottom: 20px;  /* Add padding at bottom */
+        }
+
+        /* Ensure form fields don't get cut off */
+        .modal-body {
+            overflow-y: auto;
+            max-height: calc(85vh - 120px);  /* Account for header and footer */
+            padding-bottom: 20px;
+        }
+
+        /* Keep buttons visible */
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Ensure inputs don't overflow */
+        .form-control {
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body>
     <!-- Add this near the top of the body -->
@@ -182,6 +216,23 @@
                         <label for="pints">Pints:</label>
                         <input type="number" id="pints" min="0" value="0">
                     </div>
+                    <div id="plasticOptions" style="display: none;">
+                        <div class="form-group">
+                            <label for="rollType">Roll Type:</label>
+                            <select id="rollType" name="rollType" class="form-control" onchange="toggleRollQuantity()">
+                                <option value="full">Full Roll</option>
+                                <option value="partial">Partial Roll</option>
+                            </select>
+                        </div>
+                        <div id="fullRollQuantity" class="form-group">
+                            <label for="fullRolls">Number of Full Rolls:</label>
+                            <input type="number" id="fullRolls" class="form-control" min="0">
+                        </div>
+                        <div id="partialRollQuantity" class="form-group" style="display: none;">
+                            <label for="partialRolls">Partial Roll Length (in feet):</label>
+                            <input type="number" id="partialRolls" class="form-control" min="0" step="0.1">
+                        </div>
+                    </div>
                     <div class="form-buttons">
                         <button type="submit">Save</button>
                         <button type="button" class="close-modal">Cancel</button>
@@ -215,29 +266,22 @@
         </div>
 
         <!-- Reports Modal -->
-        <div id="reportsModal" class="modal">
-            <div class="modal-content">
-                <h3>Inventory Reports</h3>
-                <div class="date-filter">
-                    <label>From: <input type="date" id="startDate"></label>
-                    <label>To: <input type="date" id="endDate"></label>
-                    <button id="filterDates">Apply Filter</button>
+        <div class="modal fade" id="reportsModal" tabindex="-1" aria-labelledby="reportsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reportsModalLabel">Activity Log</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="logsList" class="list-group">
+                            <!-- Logs will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeReportsModal()">Close</button>
+                    </div>
                 </div>
-                <div class="reports-table">
-                    <table id="reportsTable">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Item</th>
-                                <th>Action</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportsTableBody"></tbody>
-                    </table>
-                </div>
-                <button id="exportReport">Export to CSV</button>
-                <button class="close-modal">Close</button>
             </div>
         </div>
 
@@ -365,6 +409,14 @@
                     <input type="text" id="linkSearchInput" placeholder="Search for item...">
                 </div>
                 <div id="linkSearchResults" class="search-results"></div>
+            </div>
+        </div>
+
+        <!-- Add this where you want the logs to appear -->
+        <div class="container mt-4">
+            <h3>Activity Log</h3>
+            <div id="logsList" class="list-group">
+                <!-- Logs will be displayed here -->
             </div>
         </div>
 

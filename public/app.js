@@ -534,6 +534,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     setupPartialQuantities();
+
+    // Add this to where you handle paint type changes
+    document.getElementById('paintType').addEventListener('change', function() {
+        const plasticOptions = document.getElementById('plasticOptions');
+        const regularQuantity = document.getElementById('quantity');
+        
+        if (this.value.toLowerCase() === 'plastic') {
+            plasticOptions.style.display = 'block';
+            regularQuantity.style.display = 'none';
+            toggleRollQuantity();
+        } else {
+            plasticOptions.style.display = 'none';
+            regularQuantity.style.display = 'block';
+        }
+    });
+
+    // Just the new plastic-related code
+    document.getElementById('paintType').addEventListener('change', function() {
+        const plasticOptions = document.getElementById('plasticOptions');
+        const regularQuantity = document.getElementById('quantity');
+        
+        if (this.value.toLowerCase() === 'plastic') {
+            plasticOptions.style.display = 'block';
+            regularQuantity.style.display = 'none';
+            toggleRollQuantity();
+        } else {
+            plasticOptions.style.display = 'none';
+            regularQuantity.style.display = 'block';
+        }
+    });
+
+    displayLogs();
 });
 
 // DOM Elements - declare all at once at the top
@@ -773,8 +805,15 @@ function showReports() {
 }
 
 function closeReportsModal() {
-    reportsModal.style.display = 'none';
+    const modal = bootstrap.Modal.getInstance(document.getElementById('reportsModal'));
+    if (modal) {
+        modal.hide();
+    }
 }
+
+// Also add click handler for the close button
+document.querySelector('#reportsModal .btn-close').addEventListener('click', closeReportsModal);
+document.querySelector('#reportsModal .btn-secondary').addEventListener('click', closeReportsModal);
 
 function loadReports(startTimestamp = null, endTimestamp = null) {
     let query = db.ref('activity_log').orderByChild('timestamp');
@@ -1083,6 +1122,11 @@ addItemForm.addEventListener('submit', async function(e) {
         .then(() => {
             addModal.style.display = 'none';
             addItemForm.reset();
+            createLog(
+                'Item Added',
+                newItem.name,
+                `Added ${newItem.fiveGallons} × 5gal, ${newItem.singleGallons} × 1gal, ${newItem.quarts} × qt, ${newItem.pints} × pt`
+            );
         })
         .catch((error) => {
             console.error('Error adding item:', error);
@@ -1302,4 +1346,157 @@ function adjustQuantity(itemKey, field, change, event) {
             console.error('Error in adjustQuantity:', error);
             alert('Error updating quantity. Please try again.');
         });
-} 
+}
+
+// Add this function to handle showing/hiding quantity fields
+function toggleRollQuantity() {
+    const rollType = document.getElementById('rollType').value;
+    const fullRollDiv = document.getElementById('fullRollQuantity');
+    const partialRollDiv = document.getElementById('partialRollQuantity');
+    
+    if (rollType === 'full') {
+        fullRollDiv.style.display = 'block';
+        partialRollDiv.style.display = 'none';
+    } else {
+        fullRollDiv.style.display = 'none';
+        partialRollDiv.style.display = 'block';
+    }
+}
+
+// Add this helper function to get current date and time
+function getCurrentDateTime() {
+    return new Date().toLocaleString();
+}
+
+// Add this function to create logs
+function createLog(action, itemName, details) {
+    return db.collection('logs').add({
+        timestamp: new Date().toLocaleString(),
+        action: action,
+        itemName: itemName,
+        details: details,
+        date: new Date()  // for sorting
+    })
+    .then(() => {
+        console.log('Log created successfully');  // Debug message
+    })
+    .catch(error => {
+        console.error('Error creating log:', error);  // Debug message
+    });
+}
+
+// Modify your addItem function
+function addItem(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('paintName').value;
+    const type = document.getElementById('paintType').value;
+    const quantity = document.getElementById('quantity').value;
+    
+    db.collection('inventory').add({
+        name: name,
+        type: type,
+        quantity: quantity
+    }).then(() => {
+        createLog(
+            'Item Added',
+            name,
+            `Added ${quantity} of ${type}`
+        );
+        // Reset form and update UI as needed
+    });
+}
+
+// Modify your deleteItem function
+function deleteItem(id) {
+    db.collection('inventory').doc(id).get().then((doc) => {
+        const item = doc.data();
+        db.collection('inventory').doc(id).delete().then(() => {
+            createLog(
+                'Item Deleted',
+                item.name,
+                `Deleted item with quantity ${item.quantity}`
+            );
+        });
+    });
+}
+
+// Modify your updateQuantity function
+function updateQuantity(id, oldQuantity) {
+    const newQuantity = document.getElementById('newQuantity').value;
+    
+    db.collection('inventory').doc(id).get().then((doc) => {
+        const item = doc.data();
+        db.collection('inventory').doc(id).update({
+            quantity: newQuantity
+        }).then(() => {
+            createLog(
+                'Quantity Update',
+                item.name,
+                `Changed quantity from ${oldQuantity} to ${newQuantity}`
+            );
+            // Close modal or update UI as needed
+        });
+    });
+}
+
+// Add this function to display logs
+function displayLogs() {
+    const logsList = document.getElementById('logsList');
+    if (!logsList) {
+        console.error('Logs container not found');  // Debug message
+        return;
+    }
+
+    db.collection('logs')
+        .orderBy('date', 'desc')
+        .limit(50)
+        .onSnapshot((snapshot) => {
+            logsList.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const log = doc.data();
+                logsList.innerHTML += `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">${log.action}</h6>
+                            <small>${log.timestamp}</small>
+                        </div>
+                        <p class="mb-1">${log.itemName} - ${log.details}</p>
+                    </div>
+                `;
+            });
+        });
+}
+
+// Modify your existing Reports button click handler
+document.querySelector('.reports-btn').addEventListener('click', function() {
+    // Get the modal
+    const modal = new bootstrap.Modal(document.getElementById('reportsModal'));
+    
+    // Clear previous logs
+    const logsContainer = document.getElementById('logsList');
+    logsContainer.innerHTML = '';
+    
+    // Fetch and display logs
+    db.collection('logs')
+        .orderBy('date', 'desc')
+        .limit(50)
+        .get()
+        .then((snapshot) => {
+            snapshot.forEach((doc) => {
+                const log = doc.data();
+                logsContainer.innerHTML += `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">${log.action}</h6>
+                            <small>${log.timestamp}</small>
+                        </div>
+                        <p class="mb-1">${log.itemName} - ${log.details}</p>
+                    </div>
+                `;
+            });
+        });
+    
+    // Show the modal
+    modal.show();
+}); 
